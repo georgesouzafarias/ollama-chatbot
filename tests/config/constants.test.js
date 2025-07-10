@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals';
 import { CONFIG } from '../../src/config/constants.js';
 
 describe('CONFIG', () => {

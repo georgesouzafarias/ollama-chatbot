@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals';
 import { readFile, access } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { CONFIG } from '../../src/config/constants.js';
@@ -10,7 +11,7 @@ describe('System Prompt File Tests', () => {
 			try {
 				await access(systemPromptPath, constants.F_OK | constants.R_OK);
 			} catch (error) {
-				fail(
+				throw new Error(
 					`System prompt file should exist and be readable at ${systemPromptPath}: ${error.message}`,
 				);
 			}
@@ -26,7 +27,9 @@ describe('System Prompt File Tests', () => {
 				expect(typeof content).toBe('string');
 				expect(content.trim().length).toBeGreaterThan(0);
 			} catch (error) {
-				fail(`Should be able to read system prompt file: ${error.message}`);
+				throw new Error(
+					`Should be able to read system prompt file: ${error.message}`,
+				);
 			}
 		});
 
@@ -46,7 +49,7 @@ describe('System Prompt File Tests', () => {
 				expect(content.toLowerCase()).not.toContain('placeholder');
 				expect(content.toLowerCase()).not.toContain('replace this');
 			} catch (error) {
-				fail(
+				throw new Error(
 					`Should be able to validate system prompt content: ${error.message}`,
 				);
 			}
@@ -74,7 +77,9 @@ describe('System Prompt File Tests', () => {
 					}
 				}
 			} catch (error) {
-				fail(`Should be able to validate markdown format: ${error.message}`);
+				throw new Error(
+					`Should be able to validate markdown format: ${error.message}`,
+				);
 			}
 		});
 	});

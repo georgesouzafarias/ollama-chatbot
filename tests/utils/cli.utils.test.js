@@ -47,6 +47,17 @@ describe('CLIUtils', () => {
 			expect(cliUtils.isExitCommand('test')).toBe(false);
 			expect(cliUtils.isExitCommand('')).toBe(false);
 		});
+
+		test('should handle mixed case variations', () => {
+			expect(cliUtils.isExitCommand('EXIT')).toBe(true);
+			expect(cliUtils.isExitCommand('Quit')).toBe(true);
+			expect(cliUtils.isExitCommand('SAIR')).toBe(true);
+		});
+
+		test('should trim whitespace before checking', () => {
+			expect(cliUtils.isExitCommand('  exit  ')).toBe(true);
+			expect(cliUtils.isExitCommand('\tquit\n')).toBe(true);
+		});
 	});
 
 	describe('log', () => {
@@ -68,11 +79,54 @@ describe('CLIUtils', () => {
 		test('should have close method', () => {
 			expect(typeof cliUtils.close).toBe('function');
 		});
+
+		test('should close readline interface', () => {
+			const mockClose = jest.fn();
+			cliUtils.rl.close = mockClose;
+
+			cliUtils.close();
+
+			expect(mockClose).toHaveBeenCalled();
+		});
 	});
 
 	describe('question', () => {
 		test('should have question method', () => {
 			expect(typeof cliUtils.question).toBe('function');
+		});
+
+		test('should use default prompt when none provided', async () => {
+			const mockQuestion = jest.fn().mockResolvedValue('test input');
+			cliUtils.rl.question = mockQuestion;
+
+			await cliUtils.question();
+
+			expect(mockQuestion).toHaveBeenCalledWith(CONFIG.MESSAGES.PROMPT);
+		});
+
+		test('should use custom prompt when provided', async () => {
+			const mockQuestion = jest.fn().mockResolvedValue('test input');
+			cliUtils.rl.question = mockQuestion;
+			const customPrompt = 'Custom prompt: ';
+
+			await cliUtils.question(customPrompt);
+
+			expect(mockQuestion).toHaveBeenCalledWith(customPrompt);
+		});
+	});
+
+	describe('setupSignalHandlers', () => {
+		test('should setup SIGINT handler', () => {
+			const mockOn = jest.spyOn(process, 'on');
+			const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+
+			// Create new instance to test signal handler setup
+			new CLIUtils();
+
+			expect(mockOn).toHaveBeenCalledWith('SIGINT', expect.any(Function));
+
+			mockOn.mockRestore();
+			mockExit.mockRestore();
 		});
 	});
 });

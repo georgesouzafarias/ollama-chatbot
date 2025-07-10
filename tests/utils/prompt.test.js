@@ -1,11 +1,17 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { Prompts } from '../../src/utils/prompt.js';
 
 describe('Prompts', () => {
 	let prompts;
+	let consoleErrorSpy;
 
 	beforeEach(() => {
 		prompts = new Prompts();
+		consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore();
 	});
 
 	describe('constructor', () => {
@@ -27,6 +33,12 @@ describe('Prompts', () => {
 		test('should handle invalid file path gracefully', async () => {
 			const result = await prompts.loadSystemPrompt('/nonexistent/path.md');
 			expect(result).toBeUndefined();
+			expect(consoleErrorSpy).toHaveBeenCalledWith(
+				'Error reading Markdown file:',
+				expect.objectContaining({
+					code: 'ENOENT'
+				})
+			);
 		});
 
 		test('should load existing system prompt file', async () => {

@@ -20,7 +20,7 @@ export class ChatApplication {
 		try {
 			await this.chatLoop();
 		} catch (error) {
-			console.error('Erro na aplicação:', error.message);
+			console.error('Application error:', error.message);
 		} finally {
 			this.cleanup();
 		}
@@ -43,7 +43,7 @@ export class ChatApplication {
 				await this.ollamaService.sendMessage(input);
 				this.cliUtils.newLine();
 			} catch (err) {
-				this.cliUtils.log('Erro ao processar mensagem.', err.message);
+				this.cliUtils.log('Error processing message.', err.message);
 			}
 		}
 	}
@@ -53,6 +53,6 @@ export class ChatApplication {
 	}
 }
 
-// Inicializar aplicação
+// Initialize application
 const app = new ChatApplication();
 app.start().catch(console.error);

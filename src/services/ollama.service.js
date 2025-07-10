@@ -19,7 +19,7 @@ export class OllamaService {
 				this.messagesContext.unshift({ role: 'system', content: systemPrompt });
 			}
 		} catch (err) {
-			console.error('Erro ao carregar system prompt:', err.message);
+			console.error('Error loading system prompt:', err.message);
 		}
 	}
 
@@ -45,7 +45,7 @@ export class OllamaService {
 
 			return assistantMessage;
 		} catch (error) {
-			console.error('\nErro ao comunicar com Ollama:', error.message);
+			console.error('\nError communicating with Ollama:', error.message);
 			throw error;
 		}
 	}

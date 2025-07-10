@@ -108,7 +108,7 @@ describe('OllamaService', () => {
 			await ollamaService.addSystemPrompt('./nonexistent.md');
 
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
-				'Erro ao carregar system prompt:',
+				'Error loading system prompt:',
 				'File not found',
 			);
 			expect(ollamaService.messagesContext).toEqual([]);

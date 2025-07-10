@@ -10,6 +10,7 @@ class ChatApplication {
 
 	async start() {
 		this.cliUtils.log(CONFIG.MESSAGES.WELCOME);
+		await this.ollamaService.addSystemPrompt(CONFIG.PROMPTS.SYSTEM_PROMPT_PATH);
 
 		try {
 			await this.chatLoop();
@@ -36,8 +37,8 @@ class ChatApplication {
 			try {
 				await this.ollamaService.sendMessage(input);
 				this.cliUtils.newLine();
-			} catch (error) {
-				this.cliUtils.log('Erro ao processar mensagem. Tente novamente.');
+			} catch (err) {
+				this.cliUtils.log('Erro ao processar mensagem.', err.message);
 			}
 		}
 	}

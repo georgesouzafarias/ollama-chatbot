@@ -43,8 +43,6 @@ export class OllamaService {
 
 			this.addMessage('assistant', assistantMessage);
 
-			console.log(this.messagesContext);
-
 			return assistantMessage;
 		} catch (error) {
 			console.error('\nErro ao comunicar com Ollama:', error.message);

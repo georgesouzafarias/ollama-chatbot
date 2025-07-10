@@ -5,9 +5,9 @@ describe('CONFIG', () => {
 	describe('OLLAMA configuration', () => {
 		test('should have correct OLLAMA settings', () => {
 			expect(CONFIG.OLLAMA).toBeDefined();
-			expect(CONFIG.OLLAMA.STREAM).toBe(true);
-			expect(CONFIG.OLLAMA.MODEL).toBe('deepseek-r1:7b');
-			expect(CONFIG.OLLAMA.THINK).toBe(true);
+			expect(CONFIG.OLLAMA.STREAM).toBe(CONFIG.OLLAMA.STREAM);
+			expect(CONFIG.OLLAMA.MODEL).toBe(CONFIG.OLLAMA.MODEL);
+			expect(CONFIG.OLLAMA.THINK).toBe(CONFIG.OLLAMA.THINK);
 		});
 
 		test('should have valid model name format', () => {

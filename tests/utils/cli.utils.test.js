@@ -20,7 +20,9 @@ describe('CLIUtils', () => {
 
 	afterEach(() => {
 		consoleSpy.mockRestore();
-		cliUtils?.rl && cliUtils.close();
+		if (cliUtils?.rl) {
+			cliUtils.close();
+		}
 	});
 
 	describe('constructor', () => {
@@ -121,10 +123,12 @@ describe('CLIUtils', () => {
 			const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
 
 			// Create new instance to test signal handler setup
-			new CLIUtils();
+			const testCLI = new CLIUtils();
 
 			expect(mockOn).toHaveBeenCalledWith('SIGINT', expect.any(Function));
 
+			// Clean up
+			testCLI.close();
 			mockOn.mockRestore();
 			mockExit.mockRestore();
 		});

@@ -73,11 +73,11 @@ describe('CONFIG', () => {
 
 		test('should have expected message content', () => {
 			expect(CONFIG.MESSAGES.WELCOME).toBe(
-				'Digite algo ou pressione Ctrl+C para sair',
+				'Type something or press Ctrl+C to exit',
 			);
-			expect(CONFIG.MESSAGES.GOODBYE).toBe('Até logo!');
+			expect(CONFIG.MESSAGES.GOODBYE).toBe('See you later!');
 			expect(CONFIG.MESSAGES.INTERRUPTED).toBe(
-				'\nPrograma interrompido pelo usuário (Ctrl+C)',
+				'\nProgram interrupted by user (Ctrl+C)',
 			);
 			expect(CONFIG.MESSAGES.PROMPT).toBe('> ');
 		});

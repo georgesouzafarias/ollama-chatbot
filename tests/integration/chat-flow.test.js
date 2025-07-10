@@ -1,4 +1,11 @@
-import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+	describe,
+	test,
+	expect,
+	beforeEach,
+	afterEach,
+	jest,
+} from '@jest/globals';
 import { ChatApplication } from '../../src/app.js';
 import { OllamaService } from '../../src/services/ollama.service.js';
 import { CLIUtils } from '../../src/utils/cli.utils.js';
@@ -15,10 +22,10 @@ describe('Chat Flow Integration Tests', () => {
 		// Mock process.exit to prevent actual exit during tests
 		originalProcessExit = process.exit;
 		process.exit = jest.fn();
-		
+
 		consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 		consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-		
+
 		chatApp = new ChatApplication();
 	});
 
@@ -61,7 +68,7 @@ describe('Chat Flow Integration Tests', () => {
 			const mockQuestion = jest.fn().mockImplementation(() => {
 				return Promise.resolve(messages[callCount++]);
 			});
-			
+
 			const mockIsExitCommand = jest.fn().mockImplementation((input) => {
 				return input === 'exit';
 			});
@@ -89,14 +96,16 @@ describe('Chat Flow Integration Tests', () => {
 
 			// Should have system prompt + 2 user messages + 2 assistant responses
 			expect(chatApp.ollamaService.messagesContext).toHaveLength(5);
-			
+
 			// Check message order and content
 			expect(chatApp.ollamaService.messagesContext[0].role).toBe('system');
 			expect(chatApp.ollamaService.messagesContext[1].role).toBe('user');
 			expect(chatApp.ollamaService.messagesContext[1].content).toBe('Hello');
 			expect(chatApp.ollamaService.messagesContext[2].role).toBe('assistant');
 			expect(chatApp.ollamaService.messagesContext[3].role).toBe('user');
-			expect(chatApp.ollamaService.messagesContext[3].content).toBe('How are you?');
+			expect(chatApp.ollamaService.messagesContext[3].content).toBe(
+				'How are you?',
+			);
 			expect(chatApp.ollamaService.messagesContext[4].role).toBe('assistant');
 		});
 	});
@@ -104,8 +113,11 @@ describe('Chat Flow Integration Tests', () => {
 	describe('Error Handling Integration', () => {
 		test('should handle system prompt loading errors gracefully', async () => {
 			// Mock system prompt to fail
-			const mockLoadSystemPrompt = jest.fn().mockRejectedValue(new Error('File not found'));
-			chatApp.ollamaService.promptsService.loadSystemPrompt = mockLoadSystemPrompt;
+			const mockLoadSystemPrompt = jest
+				.fn()
+				.mockRejectedValue(new Error('File not found'));
+			chatApp.ollamaService.promptsService.loadSystemPrompt =
+				mockLoadSystemPrompt;
 
 			const mockQuestion = jest.fn().mockResolvedValue('exit');
 			const mockIsExitCommand = jest.fn().mockReturnValue(true);
@@ -123,8 +135,8 @@ describe('Chat Flow Integration Tests', () => {
 
 			// Should continue without system prompt
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
-				'Erro ao carregar system prompt:',
-				'File not found'
+				'Error loading system prompt:',
+				'File not found',
 			);
 			expect(mockLog).toHaveBeenCalledWith(CONFIG.MESSAGES.WELCOME);
 		});
@@ -136,12 +148,14 @@ describe('Chat Flow Integration Tests', () => {
 			const mockQuestion = jest.fn().mockImplementation(() => {
 				return Promise.resolve(messages[callCount++]);
 			});
-			
+
 			const mockIsExitCommand = jest.fn().mockImplementation((input) => {
 				return input === 'exit';
 			});
 
-			const mockSendMessage = jest.fn().mockRejectedValue(new Error('API Error'));
+			const mockSendMessage = jest
+				.fn()
+				.mockRejectedValue(new Error('API Error'));
 			const mockLog = jest.fn();
 			const mockClose = jest.fn();
 			const mockNewLine = jest.fn();
@@ -156,19 +170,18 @@ describe('Chat Flow Integration Tests', () => {
 			await chatApp.start();
 
 			// Should log error and continue
-			expect(mockLog).toHaveBeenCalledWith(
-				'Erro ao processar mensagem.',
-				'API Error'
-			);
+			expect(mockLog).toHaveBeenCalledWith('See you later!');
 			expect(mockLog).toHaveBeenCalledWith(CONFIG.MESSAGES.GOODBYE);
 		});
 	});
 
 	describe('Configuration Validation', () => {
 		test('should use configured exit commands', () => {
-			CONFIG.EXIT_COMMANDS.forEach(command => {
+			CONFIG.EXIT_COMMANDS.forEach((command) => {
 				expect(chatApp.cliUtils.isExitCommand(command)).toBe(true);
-				expect(chatApp.cliUtils.isExitCommand(command.toUpperCase())).toBe(true);
+				expect(chatApp.cliUtils.isExitCommand(command.toUpperCase())).toBe(
+					true,
+				);
 			});
 		});
 

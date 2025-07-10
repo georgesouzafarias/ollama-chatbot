@@ -3,6 +3,10 @@ import { CONFIG } from '../config/constants.js';
 
 export class CLIUtils {
 	constructor() {
+		process.stdin.setMaxListeners(20);
+		process.stdout.setMaxListeners(20);
+		process.setMaxListeners(20);
+
 		this.rl = createInterface({
 			input: process.stdin,
 			output: process.stdout,

@@ -6,7 +6,8 @@
     "main": "src/app.js",
     "scripts": {
         "start": "node src/app.js",
-        "dev": "node --watch src/app.js"
+        "dev": "node --watch src/app.js",
+        "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
     },
     "keywords": [
         "ollama",
@@ -14,9 +15,14 @@
         "ai",
         "cli"
     ],
-    "author": "Your Name",
+    "author": "George Farias",
     "license": "MIT",
     "dependencies": {
+        "@anthropic-ai/claude-code": "^1.0.44",
         "ollama": "^0.5.0"
+    },
+    "devDependencies": {
+        "@jest/globals": "^29.7.0",
+        "jest": "^29.7.0"
     }
 }

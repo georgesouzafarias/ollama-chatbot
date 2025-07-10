@@ -2,7 +2,7 @@ import { OllamaService } from './services/ollama.service.js';
 import { CLIUtils } from './utils/cli.utils.js';
 import { CONFIG } from './config/constants.js';
 
-class ChatApplication {
+export class ChatApplication {
 	constructor() {
 		this.ollamaService = new OllamaService();
 		this.cliUtils = new CLIUtils();

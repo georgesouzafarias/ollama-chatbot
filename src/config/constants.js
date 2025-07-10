@@ -9,9 +9,9 @@ export const CONFIG = {
 		SYSTEM_PROMPT_PATH: './prompts/system_prompt.md',
 	},
 	MESSAGES: {
-		WELCOME: 'Digite algo ou pressione Ctrl+C para sair',
-		GOODBYE: 'Até logo!',
-		INTERRUPTED: '\nPrograma interrompido pelo usuário (Ctrl+C)',
+		WELCOME: 'Type something or press Ctrl+C to exit',
+		GOODBYE: 'See you later!',
+		INTERRUPTED: '\nProgram interrupted by user (Ctrl+C)',
 		PROMPT: '> ',
 	},
 };

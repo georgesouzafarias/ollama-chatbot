@@ -62,7 +62,7 @@ describe('ChatApplication', () => {
 			await chatApp.start();
 
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
-				'Erro na aplicação:',
+				'Application error:',
 				testError.message
 			);
 			expect(mockClose).toHaveBeenCalled();
@@ -170,7 +170,7 @@ describe('ChatApplication', () => {
 			await chatApp.chatLoop();
 
 			expect(mockLog).toHaveBeenCalledWith(
-				'Erro ao processar mensagem.',
+				'Error processing message.',
 				testError.message
 			);
 		});

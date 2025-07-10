@@ -1,5 +1,4 @@
 import { readFile } from 'node:fs/promises';
-import { CONFIG } from '../config/constants.js';
 
 export class Prompts {
 	async loadSystemPrompt(filePath) {

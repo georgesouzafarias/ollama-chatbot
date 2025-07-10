@@ -1,8 +1,8 @@
 export const CONFIG = {
 	OLLAMA: {
 		STREAM: true,
-		MODEL: 'deepseek-r1:7b',
-		THINK: true,
+		MODEL: 'gemma3:1b',
+		THINK: false,
 	},
 	EXIT_COMMANDS: ['sair', 'exit', 'quit'],
 	PROMPTS: {

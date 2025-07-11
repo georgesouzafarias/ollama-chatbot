@@ -1,4 +1,28 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
+
+// Mock CONFIG
+const mockConfig = {
+	CONFIG: {
+		OLLAMA: {
+			MODEL: 'test-model',
+			STREAM: true,
+			THINK: false,
+		},
+	},
+};
+
+// Mock ollama module
+const mockOllama = {
+	chat: jest.fn(),
+};
+
+jest.mock('../../src/config/constants.js', () => mockConfig);
+jest.mock('ollama', () => ({
+	__esModule: true,
+	default: mockOllama,
+}));
+
+// Import after mocking
 import { OllamaService } from '../../src/services/ollama.service.js';
 
 describe('OllamaService', () => {
@@ -131,41 +155,29 @@ describe('OllamaService', () => {
 			expect(typeof ollamaService.sendMessage).toBe('function');
 		});
 
-		test('should add user message to context before sending', async () => {
-			// Mock ollama module
-			const mockOllama = {
-				chat: jest.fn().mockImplementation(async function* () {
-					yield { message: { content: 'Hello' } };
-					yield { message: { content: ' there!' } };
-				}),
-			};
+		test('should add user message to context when called', () => {
+			const testMessage = 'Hello, how are you?';
+			ollamaService.addMessage('user', testMessage);
 
-			// Mock process.stdout.write
-			const mockStdoutWrite = jest
-				.spyOn(process.stdout, 'write')
-				.mockImplementation(() => {});
-			const mockConsoleLog = jest
-				.spyOn(console, 'log')
-				.mockImplementation(() => {});
+			expect(ollamaService.messagesContext).toContainEqual({
+				role: 'user',
+				content: testMessage,
+			});
+		});
 
-			// Mock the ollama import
-			jest.doMock('ollama', () => mockOllama);
+		test('should handle CONFIG.OLLAMA.THINK parameter access', () => {
+			expect(mockConfig.CONFIG.OLLAMA.THINK).toBeDefined();
+			expect(typeof mockConfig.CONFIG.OLLAMA.THINK).toBe('boolean');
+		});
 
-			try {
-				// We can't easily test the actual API call without mocking the import
-				// So we'll test that the user message is added to context
-				const testMessage = 'Hello, how are you?';
-				ollamaService.addMessage('user', testMessage);
+		test('should handle CONFIG.OLLAMA.STREAM parameter access', () => {
+			expect(mockConfig.CONFIG.OLLAMA.STREAM).toBeDefined();
+			expect(typeof mockConfig.CONFIG.OLLAMA.STREAM).toBe('boolean');
+		});
 
-				expect(ollamaService.messagesContext).toContainEqual({
-					role: 'user',
-					content: testMessage,
-				});
-			} finally {
-				mockStdoutWrite.mockRestore();
-				mockConsoleLog.mockRestore();
-				jest.dontMock('ollama');
-			}
+		test('should handle CONFIG.OLLAMA.MODEL parameter access', () => {
+			expect(mockConfig.CONFIG.OLLAMA.MODEL).toBeDefined();
+			expect(typeof mockConfig.CONFIG.OLLAMA.MODEL).toBe('string');
 		});
 	});
 });

@@ -29,6 +29,12 @@ export class OllamaService {
 			messages: this.messagesContext,
 			stream: CONFIG.OLLAMA.STREAM,
 			think: CONFIG.OLLAMA.THINK,
+			//format: CONFIG.OLLAMA.FORMAT,
+			options: {
+				temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
+				top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
+				repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
+			},
 		});
 
 		return response;

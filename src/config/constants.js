@@ -3,6 +3,13 @@ export const CONFIG = {
 		STREAM: true,
 		MODEL: 'deepseek-r1:1.5b',
 		THINK: false,
+		//BUG: for some reason, the ollama package only supporting the 'json' format
+		//FORMAT: 'json',
+		OPTIONS: {
+			TEMPERATURE: 0.8,
+			TOP_P: 0.9,
+			REPEAT_PENALTY: 1.1,
+		},
 	},
 	EXIT_COMMANDS: ['sair', 'exit', 'quit'],
 	PROMPTS: {

@@ -40,7 +40,12 @@ export class ChatApplication {
 			}
 
 			try {
-				await this.ollamaService.sendMessage(input);
+				if (CONFIG.OLLAMA.STREAM) {
+					await this.ollamaService.sendMessageStream(input);
+				} else {
+					await this.ollamaService.sendMessage(input);
+				}
+
 				this.cliUtils.newLine();
 			} catch (err) {
 				this.cliUtils.log('Error processing message.', err.message);

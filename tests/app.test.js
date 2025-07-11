@@ -135,6 +135,7 @@ describe('ChatApplication', () => {
 				.mockReturnValueOnce(true);
 			const mockLog = jest.fn();
 			const mockSendMessage = jest.fn().mockResolvedValue('Response');
+			const mockSendMessageStream = jest.fn().mockResolvedValue('Response');
 			const mockNewLine = jest.fn();
 
 			chatApp.cliUtils.question = mockQuestion;
@@ -142,10 +143,12 @@ describe('ChatApplication', () => {
 			chatApp.cliUtils.log = mockLog;
 			chatApp.cliUtils.newLine = mockNewLine;
 			chatApp.ollamaService.sendMessage = mockSendMessage;
+			chatApp.ollamaService.sendMessageStream = mockSendMessageStream;
 
 			await chatApp.chatLoop();
 
-			expect(mockSendMessage).toHaveBeenCalledWith(testMessage);
+			// Since CONFIG.OLLAMA.STREAM is true, it should call sendMessageStream
+			expect(mockSendMessageStream).toHaveBeenCalledWith(testMessage);
 			expect(mockNewLine).toHaveBeenCalled();
 		});
 
@@ -161,11 +164,13 @@ describe('ChatApplication', () => {
 				.mockReturnValueOnce(true);
 			const mockLog = jest.fn();
 			const mockSendMessage = jest.fn().mockRejectedValue(testError);
+			const mockSendMessageStream = jest.fn().mockRejectedValue(testError);
 
 			chatApp.cliUtils.question = mockQuestion;
 			chatApp.cliUtils.isExitCommand = mockIsExitCommand;
 			chatApp.cliUtils.log = mockLog;
 			chatApp.ollamaService.sendMessage = mockSendMessage;
+			chatApp.ollamaService.sendMessageStream = mockSendMessageStream;
 
 			await chatApp.chatLoop();
 

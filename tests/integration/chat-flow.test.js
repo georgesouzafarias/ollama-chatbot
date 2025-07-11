@@ -7,9 +7,6 @@ import {
 	jest,
 } from '@jest/globals';
 import { ChatApplication } from '../../src/app.js';
-import { OllamaService } from '../../src/services/ollama.service.js';
-import { CLIUtils } from '../../src/utils/cli.utils.js';
-import { Prompts } from '../../src/utils/prompt.js';
 import { CONFIG } from '../../src/config/constants.js';
 
 describe('Chat Flow Integration Tests', () => {
@@ -29,7 +26,7 @@ describe('Chat Flow Integration Tests', () => {
 		chatApp = new ChatApplication();
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		process.exit = originalProcessExit;
 		consoleErrorSpy.mockRestore();
 		consoleLogSpy.mockRestore();

@@ -35,15 +35,44 @@ export class OllamaService {
 			});
 
 			let assistantMessage = '';
-			for await (const part of response) {
-				const content = part.message.content;
-				process.stdout.write(content);
-				assistantMessage += content;
+
+			if (CONFIG.OLLAMA.THINK) {
+				let startedThinking = false;
+				let finishedThinking = false;
+
+				for await (const part of response) {
+					if (part.message.thinking && !startedThinking) {
+						startedThinking = true;
+						process.stdout.write('Thinking:\n========\n\n');
+					} else if (
+						part.message.content &&
+						startedThinking &&
+						!finishedThinking
+					) {
+						finishedThinking = true;
+						process.stdout.write('\n\nResponse:\n========\n\n');
+					}
+
+					if (part.message.thinking) {
+						process.stdout.write(part.message.thinking);
+					} else if (part.message.content) {
+						const content = part.message.content;
+						process.stdout.write(content);
+						assistantMessage += content;
+					}
+				}
+				this.addMessage('assistant', assistantMessage);
+				return assistantMessage;
+			} else {
+				for await (const part of response) {
+					const content = part.message.content;
+					process.stdout.write(content);
+					assistantMessage += content;
+					this.addMessage('assistant', assistantMessage);
+				}
+				this.addMessage('assistant', assistantMessage);
+				return assistantMessage;
 			}
-
-			this.addMessage('assistant', assistantMessage);
-
-			return assistantMessage;
 		} catch (error) {
 			console.error('\nError communicating with Ollama:', error.message);
 			throw error;

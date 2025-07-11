@@ -42,7 +42,6 @@ export class ChatApplication {
 			try {
 				await this.ollamaService.sendMessage(input);
 				this.cliUtils.newLine();
-				console.log(this.ollamaService.getContext());
 			} catch (err) {
 				this.cliUtils.log('Error processing message.', err.message);
 			}

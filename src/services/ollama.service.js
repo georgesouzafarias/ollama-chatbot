@@ -23,17 +23,50 @@ export class OllamaService {
 		}
 	}
 
+	async processMessage() {
+		const response = await ollama.chat({
+			model: CONFIG.OLLAMA.MODEL,
+			messages: this.messagesContext,
+			stream: CONFIG.OLLAMA.STREAM,
+			think: CONFIG.OLLAMA.THINK,
+		});
+
+		return response;
+	}
+
 	async sendMessage(message) {
 		this.addMessage('user', message);
 
 		try {
-			const response = await ollama.chat({
-				model: CONFIG.OLLAMA.MODEL,
-				messages: this.messagesContext,
-				stream: CONFIG.OLLAMA.STREAM,
-				think: CONFIG.OLLAMA.THINK,
-			});
+			const response = await this.processMessage();
+			let assistantMessage = '';
 
+			if (CONFIG.OLLAMA.THINK) {
+				const thinking = response.message.thinking;
+				const content = response.message.content;
+				process.stdout.write('Thinking:\n========\n\n');
+				process.stdout.write(thinking);
+				process.stdout.write('\n\nResponse:\n========\n\n');
+				assistantMessage += content;
+				process.stdout.write(content);
+				this.addMessage('assistant', assistantMessage);
+			} else {
+				const content = response.message.content;
+				assistantMessage += content;
+				process.stdout.write(content);
+				this.addMessage('assistant', assistantMessage);
+			}
+		} catch (error) {
+			console.error('\nError communicating with Ollama:', error.message);
+			throw error;
+		}
+	}
+
+	async sendMessageStream(message) {
+		this.addMessage('user', message);
+
+		try {
+			const response = await this.processMessage();
 			let assistantMessage = '';
 
 			if (CONFIG.OLLAMA.THINK) {
@@ -62,16 +95,13 @@ export class OllamaService {
 					}
 				}
 				this.addMessage('assistant', assistantMessage);
-				return assistantMessage;
 			} else {
 				for await (const part of response) {
 					const content = part.message.content;
 					process.stdout.write(content);
 					assistantMessage += content;
-					this.addMessage('assistant', assistantMessage);
 				}
 				this.addMessage('assistant', assistantMessage);
-				return assistantMessage;
 			}
 		} catch (error) {
 			console.error('\nError communicating with Ollama:', error.message);

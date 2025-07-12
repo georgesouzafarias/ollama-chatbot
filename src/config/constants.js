@@ -1,7 +1,7 @@
 export const CONFIG = {
 	OLLAMA: {
-		STREAM: true,
-		MODEL: 'deepseek-r1:1.5b',
+		STREAM: false,
+		MODEL: 'llama3.1:latest',
 		THINK: false,
 		//BUG: for some reason, the ollama package only supporting the 'json' format
 		FORMAT: null,

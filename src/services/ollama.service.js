@@ -1,11 +1,15 @@
 import ollama from 'ollama';
 import { CONFIG } from '../config/constants.js';
 import { Prompts } from '../utils/prompt.js';
+import { CalculatorTools } from '../tools/calculator.js';
 
 export class OllamaService {
 	constructor() {
 		this.messagesContext = [];
 		this.promptsService = new Prompts();
+		this.calculatorTools = new CalculatorTools();
+		this.allTools = [...this.calculatorTools.getTools()];
+		this.availableFunctions = this.calculatorTools.availableFunctions;
 	}
 
 	addMessage(role, content) {
@@ -30,18 +34,24 @@ export class OllamaService {
 			stream: CONFIG.OLLAMA.STREAM,
 			think: CONFIG.OLLAMA.THINK,
 			format: CONFIG.OLLAMA.FORMAT,
+			tools: this.allTools,
 			options: {
 				temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
 				top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
 				repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
 			},
 		});
+		if (response.message.tool_calls) {
+			console.log(response);
+
+			this.processToolCalls(response.message.tool_calls);
+		}
 
 		return response;
 	}
 
-	async sendMessage(message) {
-		this.addMessage('user', message);
+	async sendMessage(message, role = 'user') {
+		this.addMessage(role, message);
 
 		try {
 			const response = await this.processMessage();
@@ -68,8 +78,8 @@ export class OllamaService {
 		}
 	}
 
-	async sendMessageStream(message) {
-		this.addMessage('user', message);
+	async sendMessageStream(message, role = user) {
+		this.addMessage(role, message);
 
 		try {
 			const response = await this.processMessage();
@@ -113,6 +123,36 @@ export class OllamaService {
 			console.error('\nError communicating with Ollama:', error.message);
 			throw error;
 		}
+	}
+
+	executeFunction(functionName, args) {
+		const func = this.availableFunctions[functionName];
+		if (!func) {
+			throw new Error(`Function '${functionName}' not found`);
+		}
+
+		try {
+			return func(args.a, args.b);
+		} catch (error) {
+			console.error(`Erro calling ${functionName}:`, error.message);
+			throw error;
+		}
+	}
+
+	async processToolCalls(toolCalls) {
+		const results = [];
+		for (const tool of toolCalls) {
+			const functionName = tool.function.name;
+			const args = tool.function.arguments;
+			try {
+				const result = this.executeFunction(functionName, args);
+				this.sendMessage(result.toString(), 'tool');
+			} catch (error) {
+				console.log(`Erro: ${error.message}`);
+			}
+		}
+
+		return results;
 	}
 
 	clearContext() {

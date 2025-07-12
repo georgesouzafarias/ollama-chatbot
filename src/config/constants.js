@@ -1,7 +1,7 @@
 export const CONFIG = {
 	OLLAMA: {
 		STREAM: false,
-		MODEL: 'llama3.1:latest',
+		MODEL: 'llama3.1:latest', //mistral-nemo:12b
 		THINK: false,
 		//BUG: for some reason, the ollama package only supporting the 'json' format
 		FORMAT: null,

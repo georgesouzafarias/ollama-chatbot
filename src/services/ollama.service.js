@@ -160,7 +160,7 @@ export class OllamaService {
 					role: 'tool',
 					content: `Erro: ${error.message}`,
 				});
-				console.log(`Erro: ${error.message}`);
+				console.error(`Erro: ${error.message}`);
 			}
 		}
 

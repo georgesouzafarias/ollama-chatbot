@@ -41,10 +41,28 @@ export class OllamaService {
 				repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
 			},
 		});
-		if (response.message.tool_calls) {
-			console.log(response);
 
-			this.processToolCalls(response.message.tool_calls);
+		if (response.message.tool_calls) {
+			this.messagesContext.push(response.message);
+			const toolResults = await this.processToolCalls(
+				response.message.tool_calls,
+			);
+			this.messagesContext.push(...toolResults);
+
+			const finalResponse = await ollama.chat({
+				model: CONFIG.OLLAMA.MODEL,
+				messages: this.messagesContext,
+				stream: CONFIG.OLLAMA.STREAM,
+				think: CONFIG.OLLAMA.THINK,
+				format: CONFIG.OLLAMA.FORMAT,
+				options: {
+					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
+					top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
+					repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
+				},
+			});
+
+			return finalResponse;
 		}
 
 		return response;
@@ -78,7 +96,7 @@ export class OllamaService {
 		}
 	}
 
-	async sendMessageStream(message, role = user) {
+	async sendMessageStream(message, role = 'user') {
 		this.addMessage(role, message);
 
 		try {
@@ -146,8 +164,15 @@ export class OllamaService {
 			const args = tool.function.arguments;
 			try {
 				const result = this.executeFunction(functionName, args);
-				this.sendMessage(result.toString(), 'tool');
+				results.push({
+					role: 'tool',
+					content: result.toString(),
+				});
 			} catch (error) {
+				results.push({
+					role: 'tool',
+					content: `Erro: ${error.message}`,
+				});
 				console.log(`Erro: ${error.message}`);
 			}
 		}

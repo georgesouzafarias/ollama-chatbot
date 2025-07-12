@@ -1,4 +1,11 @@
-import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+	describe,
+	test,
+	expect,
+	beforeEach,
+	afterEach,
+	jest,
+} from '@jest/globals';
 import { ChatApplication } from '../src/app.js';
 import { CONFIG } from '../src/config/constants.js';
 
@@ -43,7 +50,7 @@ describe('ChatApplication', () => {
 
 			expect(mockLog).toHaveBeenCalledWith(CONFIG.MESSAGES.WELCOME);
 			expect(mockAddSystemPrompt).toHaveBeenCalledWith(
-				CONFIG.PROMPTS.SYSTEM_PROMPT_PATH
+				CONFIG.PROMPTS.SYSTEM_PROMPT_PATH,
 			);
 		});
 
@@ -63,7 +70,7 @@ describe('ChatApplication', () => {
 
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
 				'Application error:',
-				testError.message
+				testError.message,
 			);
 			expect(mockClose).toHaveBeenCalled();
 		});
@@ -106,12 +113,14 @@ describe('ChatApplication', () => {
 		});
 
 		test('should skip empty input', async () => {
-			const mockQuestion = jest.fn()
-				.mockResolvedValueOnce('   ')  // Empty input
+			const mockQuestion = jest
+				.fn()
+				.mockResolvedValueOnce('   ') // Empty input
 				.mockResolvedValueOnce('exit'); // Exit command
-			const mockIsExitCommand = jest.fn()
-				.mockReturnValueOnce(false)    // For empty input
-				.mockReturnValueOnce(true);    // For exit command
+			const mockIsExitCommand = jest
+				.fn()
+				.mockReturnValueOnce(false) // For empty input
+				.mockReturnValueOnce(true); // For exit command
 			const mockLog = jest.fn();
 			const mockSendMessage = jest.fn();
 
@@ -127,10 +136,12 @@ describe('ChatApplication', () => {
 
 		test('should process non-empty input', async () => {
 			const testMessage = 'Hello, how are you?';
-			const mockQuestion = jest.fn()
+			const mockQuestion = jest
+				.fn()
 				.mockResolvedValueOnce(testMessage)
 				.mockResolvedValueOnce('exit');
-			const mockIsExitCommand = jest.fn()
+			const mockIsExitCommand = jest
+				.fn()
 				.mockReturnValueOnce(false)
 				.mockReturnValueOnce(true);
 			const mockLog = jest.fn();
@@ -147,19 +158,24 @@ describe('ChatApplication', () => {
 
 			await chatApp.chatLoop();
 
-			// Since CONFIG.OLLAMA.STREAM is true, it should call sendMessageStream
-			expect(mockSendMessageStream).toHaveBeenCalledWith(testMessage);
+			if (CONFIG.OLLAMA.STREAM) {
+				expect(mockSendMessageStream).toHaveBeenCalledWith(testMessage);
+			} else {
+				expect(mockSendMessage).toHaveBeenCalledWith(testMessage);
+			}
 			expect(mockNewLine).toHaveBeenCalled();
 		});
 
 		test('should handle message processing errors', async () => {
 			const testMessage = 'Hello';
 			const testError = new Error('Network error');
-			
-			const mockQuestion = jest.fn()
+
+			const mockQuestion = jest
+				.fn()
 				.mockResolvedValueOnce(testMessage)
 				.mockResolvedValueOnce('exit');
-			const mockIsExitCommand = jest.fn()
+			const mockIsExitCommand = jest
+				.fn()
 				.mockReturnValueOnce(false)
 				.mockReturnValueOnce(true);
 			const mockLog = jest.fn();
@@ -176,7 +192,7 @@ describe('ChatApplication', () => {
 
 			expect(mockLog).toHaveBeenCalledWith(
 				'Error processing message.',
-				testError.message
+				testError.message,
 			);
 		});
 	});

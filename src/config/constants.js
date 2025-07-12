@@ -1,7 +1,7 @@
 export const CONFIG = {
 	OLLAMA: {
-		STREAM: false,
-		MODEL: 'llama3.1:latest', //mistral-nemo:12b
+		STREAM: false, //Stream is not working with tools so far.
+		MODEL: 'llama3.1:latest', //mistral-nemo:12b has a peculiar behavior with the tool calls, so we are using llama3.1:latest for now
 		THINK: false,
 		//BUG: for some reason, the ollama package only supporting the 'json' format
 		FORMAT: null,

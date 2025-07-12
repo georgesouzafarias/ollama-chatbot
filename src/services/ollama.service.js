@@ -49,20 +49,7 @@ export class OllamaService {
 			);
 			this.messagesContext.push(...toolResults);
 
-			const finalResponse = await ollama.chat({
-				model: CONFIG.OLLAMA.MODEL,
-				messages: this.messagesContext,
-				stream: CONFIG.OLLAMA.STREAM,
-				think: CONFIG.OLLAMA.THINK,
-				format: CONFIG.OLLAMA.FORMAT,
-				options: {
-					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
-					top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
-					repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
-				},
-			});
-
-			return finalResponse;
+			return await this.processMessage();
 		}
 
 		return response;

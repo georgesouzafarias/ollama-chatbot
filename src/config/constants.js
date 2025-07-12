@@ -1,10 +1,10 @@
 export const CONFIG = {
 	OLLAMA: {
-		STREAM: true,
-		MODEL: 'deepseek-r1:1.5b',
+		STREAM: false, //Stream is not working with tools so far.
+		MODEL: 'llama3.1:latest', //mistral-nemo:12b has a peculiar behavior with the tool calls, so we are using llama3.1:latest for now
 		THINK: false,
 		//BUG: for some reason, the ollama package only supporting the 'json' format
-		//FORMAT: 'json',
+		FORMAT: null,
 		OPTIONS: {
 			TEMPERATURE: 0.8,
 			TOP_P: 0.9,

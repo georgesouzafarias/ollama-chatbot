@@ -1,30 +1,33 @@
 export class CalculatorTools {
 	constructor() {
 		this.availableFunctions = {
-			addTwoNumbers: this.addTwoNumbers.bind(this),
-			subtractTwoNumbers: this.subtractTwoNumbers.bind(this),
-			multiplyTwoNumbers: this.multiplyTwoNumbers.bind(this),
+			addNumbers: this.addNumbers.bind(this),
+			subtractNumbers: this.subtractNumbers.bind(this),
+			multiplyNumbers: this.multiplyNumbers.bind(this),
 			divideTwoNumbers: this.divideTwoNumbers.bind(this),
 		};
 
 		this.tools = [
-			this.addTwoNumbersTool,
-			this.subtractTwoNumbersTool,
-			this.multiplyTwoNumbersTool,
+			this.addNumbersTool,
+			this.subtractNumbersTool,
+			this.multiplyNumbersTool,
 			this.divideTwoNumbersTool,
 		];
 	}
 
-	addTwoNumbers(a, b) {
-		return Number(a) + Number(b);
+	addNumbers(listNumber = []) {
+		checkIsArray(listNumber);
+		return listNumber.reduce((result, num) => result + num, 0);
 	}
 
-	subtractTwoNumbers(a, b) {
-		return Number(a) - Number(b);
+	subtractNumbers(listNumber = []) {
+		checkIsArray(listNumber);
+		return listNumber.reduce((result, num) => result - num, 0);
 	}
 
-	multiplyTwoNumbers(a, b) {
-		return Number(a) * Number(b);
+	multiplyNumbers(listNumber = []) {
+		checkIsArray(listNumber);
+		return listNumber.reduce((result, num) => result * num, 0);
 	}
 
 	divideTwoNumbers(a, b) {
@@ -34,49 +37,46 @@ export class CalculatorTools {
 		return Number(a) / Number(b);
 	}
 
-	addTwoNumbersTool = {
+	addNumbersTool = {
 		type: 'function',
 		function: {
-			name: 'addTwoNumbers',
-			description: 'Add two numbers together',
+			name: 'addNumbers',
+			description: 'Sum a list of numbers',
 			parameters: {
-				type: 'object',
-				required: ['a', 'b'],
+				type: 'list',
+				required: ['array'],
 				properties: {
-					a: { type: 'number', description: 'The first number' },
-					b: { type: 'number', description: 'The second number' },
+					array: { type: 'list', description: 'list of numbers' },
 				},
 			},
 		},
 	};
 
-	subtractTwoNumbersTool = {
+	subtractNumbersTool = {
 		type: 'function',
 		function: {
-			name: 'subtractTwoNumbers',
-			description: 'Subtract the second number from the first number',
+			name: 'subtractNumbers',
+			description: 'Subtract numbers',
 			parameters: {
-				type: 'object',
-				required: ['a', 'b'],
+				type: 'list',
+				required: ['array'],
 				properties: {
-					a: { type: 'number', description: 'The first number (minuend)' },
-					b: { type: 'number', description: 'The second number (subtrahend)' },
+					array: { type: 'list', description: 'list of numbers' },
 				},
 			},
 		},
 	};
 
-	multiplyTwoNumbersTool = {
+	multiplyNumbersTool = {
 		type: 'function',
 		function: {
-			name: 'multiplyTwoNumbers',
-			description: 'Multiply two numbers together',
+			name: 'multiplyNumbers',
+			description: 'Multiply numbers together',
 			parameters: {
-				type: 'object',
-				required: ['a', 'b'],
+				type: 'list',
+				required: ['array'],
 				properties: {
-					a: { type: 'number', description: 'The first number' },
-					b: { type: 'number', description: 'The second number' },
+					array: { type: 'list', description: 'list of numbers' },
 				},
 			},
 		},
@@ -110,5 +110,13 @@ export class CalculatorTools {
 
 	getAvailableFunctions() {
 		return Object.keys(this.availableFunctions);
+	}
+
+	checkIsArray(Numbers) {
+		if (!Array.isArray(listNumber)) {
+			throw new Error('Input must be an array of number');
+		} else {
+			return true;
+		}
 	}
 }

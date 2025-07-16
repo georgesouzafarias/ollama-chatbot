@@ -1,15 +1,23 @@
 import ollama from 'ollama';
 import { CONFIG } from '../config/constants.js';
 import { Prompts } from '../utils/prompt.js';
-import { CalculatorTools } from '../tools/calculator.js';
+import { CalculatorTools } from '../tools/calculatorTools.js';
+import { PineconeStoreTools } from '../tools/pineconeTools.js';
 
 export class OllamaService {
 	constructor() {
 		this.messagesContext = [];
 		this.promptsService = new Prompts();
 		this.calculatorTools = new CalculatorTools();
-		this.allTools = [...this.calculatorTools.getTools()];
-		this.availableFunctions = this.calculatorTools.availableFunctions;
+		this.pineconeStoreTools = new PineconeStoreTools();
+		this.allTools = [
+			...this.calculatorTools.getTools(),
+			...this.pineconeStoreTools.getTools(),
+		];
+		this.availableFunctions = {
+			...this.calculatorTools.availableFunctions,
+			...this.pineconeStoreTools.availableFunctions,
+		};
 	}
 
 	addMessage(role, content) {
@@ -132,12 +140,13 @@ export class OllamaService {
 
 	executeFunction(functionName, args) {
 		const func = this.availableFunctions[functionName];
+
 		if (!func) {
 			throw new Error(`Function '${functionName}' not found`);
 		}
 
 		try {
-			return func(args.a, args.b);
+			return func(args);
 		} catch (error) {
 			console.error(`Erro calling ${functionName}:`, error.message);
 			throw error;

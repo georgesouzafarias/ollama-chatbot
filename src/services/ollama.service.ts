@@ -1,9 +1,22 @@
-import ollama from 'ollama';
+import ollama, { ChatResponse, ToolCall } from 'ollama';
 import { CONFIG } from '../config/constants.js';
 import { Prompts } from '../utils/prompt.js';
 import { CalculatorTools } from '../tools/calculator.js';
 
+interface Message {
+	role: string;
+	content: string;
+	thinking?: string;
+	tool_calls?: ToolCall[];
+}
+
 export class OllamaService {
+	private messagesContext: Message[];
+	private promptsService: Prompts;
+	private calculatorTools: CalculatorTools;
+	private allTools: any[];
+	private availableFunctions: Record<string, Function>;
+
 	constructor() {
 		this.messagesContext = [];
 		this.promptsService = new Prompts();
@@ -12,61 +25,75 @@ export class OllamaService {
 		this.availableFunctions = this.calculatorTools.availableFunctions;
 	}
 
-	addMessage(role, content) {
+	addMessage(role: string, content: string): void {
 		this.messagesContext.push({ role, content });
 	}
 
-	async addSystemPrompt(filePath) {
+	async addSystemPrompt(filePath: string): Promise<void> {
 		try {
 			const systemPrompt = await this.promptsService.loadSystemPrompt(filePath);
 			if (systemPrompt) {
 				this.messagesContext.unshift({ role: 'system', content: systemPrompt });
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Error loading system prompt:', err.message);
 		}
 	}
 
-	async processMessage() {
-		const response = await ollama.chat({
-			model: CONFIG.OLLAMA.MODEL,
-			messages: this.messagesContext,
-			stream: CONFIG.OLLAMA.STREAM,
-			think: CONFIG.OLLAMA.THINK,
-			format: CONFIG.OLLAMA.FORMAT,
-			tools: this.allTools,
-			options: {
-				temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
-				top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
-				repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
-			},
-		});
+	private async processMessage(): Promise<ChatResponse | AsyncIterable<ChatResponse>> {
+		if (CONFIG.OLLAMA.STREAM) {
+			return await ollama.chat({
+				model: CONFIG.OLLAMA.MODEL,
+				messages: this.messagesContext,
+				stream: true,
+				think: CONFIG.OLLAMA.THINK,
+				format: CONFIG.OLLAMA.FORMAT || undefined,
+				tools: this.allTools,
+				options: {
+					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
+					top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
+					repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
+				},
+			});
+		} else {
+			const response = await ollama.chat({
+				model: CONFIG.OLLAMA.MODEL,
+				messages: this.messagesContext,
+				stream: false,
+				think: CONFIG.OLLAMA.THINK,
+				format: CONFIG.OLLAMA.FORMAT || undefined,
+				tools: this.allTools,
+				options: {
+					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
+					top_p: CONFIG.OLLAMA.OPTIONS.TOP_P,
+					repeat_penalty: CONFIG.OLLAMA.OPTIONS.REPEAT_PENALTY,
+				},
+			});
 
-		if (response.message.tool_calls) {
-			this.messagesContext.push(response.message);
-			const toolResults = await this.processToolCalls(
-				response.message.tool_calls,
-			);
-			this.messagesContext.push(...toolResults);
+			if (response.message.tool_calls) {
+				this.messagesContext.push(response.message);
+				const toolResults = await this.processToolCalls(response.message.tool_calls);
+				this.messagesContext.push(...toolResults);
 
-			return await this.processMessage();
+				return await this.processMessage();
+			}
+
+			return response;
 		}
-
-		return response;
 	}
 
-	async sendMessage(message, role = 'user') {
+	async sendMessage(message: string, role: string = 'user'): Promise<void> {
 		this.addMessage(role, message);
 
 		try {
-			const response = await this.processMessage();
+			const response = await this.processMessage() as ChatResponse;
 			let assistantMessage = '';
 
 			if (CONFIG.OLLAMA.THINK) {
 				const thinking = response.message.thinking;
 				const content = response.message.content;
 				process.stdout.write('Thinking:\n========\n\n');
-				process.stdout.write(thinking);
+				process.stdout.write(thinking || '');
 				process.stdout.write('\n\nResponse:\n========\n\n');
 				assistantMessage += content;
 				process.stdout.write(content);
@@ -77,17 +104,17 @@ export class OllamaService {
 				process.stdout.write(content);
 				this.addMessage('assistant', assistantMessage);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('\nError communicating with Ollama:', error.message);
 			throw error;
 		}
 	}
 
-	async sendMessageStream(message, role = 'user') {
+	async sendMessageStream(message: string, role: string = 'user'): Promise<void> {
 		this.addMessage(role, message);
 
 		try {
-			const response = await this.processMessage();
+			const response = await this.processMessage() as AsyncIterable<ChatResponse>;
 			let assistantMessage = '';
 
 			if (CONFIG.OLLAMA.THINK) {
@@ -124,13 +151,13 @@ export class OllamaService {
 				}
 				this.addMessage('assistant', assistantMessage);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('\nError communicating with Ollama:', error.message);
 			throw error;
 		}
 	}
 
-	executeFunction(functionName, args) {
+	private executeFunction(functionName: string, args: any): any {
 		const func = this.availableFunctions[functionName];
 		if (!func) {
 			throw new Error(`Function '${functionName}' not found`);
@@ -138,14 +165,14 @@ export class OllamaService {
 
 		try {
 			return func(args.a, args.b);
-		} catch (error) {
+		} catch (error: any) {
 			console.error(`Erro calling ${functionName}:`, error.message);
 			throw error;
 		}
 	}
 
-	async processToolCalls(toolCalls) {
-		const results = [];
+	private async processToolCalls(toolCalls: ToolCall[]): Promise<Message[]> {
+		const results: Message[] = [];
 		for (const tool of toolCalls) {
 			const functionName = tool.function.name;
 			const args = tool.function.arguments;
@@ -155,7 +182,7 @@ export class OllamaService {
 					role: 'tool',
 					content: result.toString(),
 				});
-			} catch (error) {
+			} catch (error: any) {
 				results.push({
 					role: 'tool',
 					content: `Erro: ${error.message}`,
@@ -167,11 +194,11 @@ export class OllamaService {
 		return results;
 	}
 
-	clearContext() {
+	clearContext(): void {
 		this.messagesContext = [];
 	}
 
-	getContext() {
+	getContext(): Message[] {
 		return [...this.messagesContext];
 	}
 }

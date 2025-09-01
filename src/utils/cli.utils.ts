@@ -1,7 +1,9 @@
-import { createInterface } from 'readline/promises';
+import { createInterface, Interface } from 'readline/promises';
 import { CONFIG } from '../config/constants.js';
 
 export class CLIUtils {
+	private rl: Interface;
+
 	constructor() {
 		process.stdin.setMaxListeners(20);
 		process.stdout.setMaxListeners(20);
@@ -15,7 +17,7 @@ export class CLIUtils {
 		this.setupSignalHandlers();
 	}
 
-	setupSignalHandlers() {
+	private setupSignalHandlers(): void {
 		process.on('SIGINT', () => {
 			console.log(CONFIG.MESSAGES.INTERRUPTED);
 			this.close();
@@ -23,23 +25,23 @@ export class CLIUtils {
 		});
 	}
 
-	async question(prompt = CONFIG.MESSAGES.PROMPT) {
+	async question(prompt: string = CONFIG.MESSAGES.PROMPT): Promise<string> {
 		return await this.rl.question(prompt);
 	}
 
-	isExitCommand(input) {
+	isExitCommand(input: string): boolean {
 		return CONFIG.EXIT_COMMANDS.includes(input.toLowerCase().trim());
 	}
 
-	close() {
+	close(): void {
 		this.rl.close();
 	}
 
-	log(message) {
-		console.log(message);
+	log(message: string, ...args: any[]): void {
+		console.log(message, ...args);
 	}
 
-	newLine() {
+	newLine(): void {
 		console.log();
 	}
 }

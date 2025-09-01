@@ -1,4 +1,7 @@
 export class CalculatorTools {
+	public availableFunctions: Record<string, Function>;
+	private tools: any[];
+
 	constructor() {
 		this.availableFunctions = {
 			addNumbers: this.addNumbers.bind(this),
@@ -15,22 +18,22 @@ export class CalculatorTools {
 		];
 	}
 
-	addNumbers(listNumber = []) {
-		checkIsArray(listNumber);
+	addNumbers(listNumber: number[] = []): number {
+		this.checkIsArray(listNumber);
 		return listNumber.reduce((result, num) => result + num, 0);
 	}
 
-	subtractNumbers(listNumber = []) {
-		checkIsArray(listNumber);
+	subtractNumbers(listNumber: number[] = []): number {
+		this.checkIsArray(listNumber);
 		return listNumber.reduce((result, num) => result - num, 0);
 	}
 
-	multiplyNumbers(listNumber = []) {
-		checkIsArray(listNumber);
+	multiplyNumbers(listNumber: number[] = []): number {
+		this.checkIsArray(listNumber);
 		return listNumber.reduce((result, num) => result * num, 0);
 	}
 
-	divideTwoNumbers(a, b) {
+	divideTwoNumbers(a: number, b: number): number {
 		if (Number(b) === 0) {
 			throw new Error('Division by zero is not allowed');
 		}
@@ -112,11 +115,10 @@ export class CalculatorTools {
 		return Object.keys(this.availableFunctions);
 	}
 
-	checkIsArray(Numbers) {
-		if (!Array.isArray(listNumber)) {
+	checkIsArray(numbers: any): boolean {
+		if (!Array.isArray(numbers)) {
 			throw new Error('Input must be an array of number');
-		} else {
-			return true;
 		}
+		return true;
 	}
 }

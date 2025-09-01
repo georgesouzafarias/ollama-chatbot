@@ -1,9 +1,16 @@
-import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+	describe,
+	test,
+	expect,
+	beforeEach,
+	afterEach,
+	jest,
+} from '@jest/globals';
 import { Prompts } from '../../src/utils/prompt.js';
 
 describe('Prompts', () => {
-	let prompts;
-	let consoleErrorSpy;
+	let prompts: Prompts;
+	let consoleErrorSpy: jest.SpiedFunction<typeof console.error>;
 
 	beforeEach(() => {
 		prompts = new Prompts();
@@ -36,8 +43,8 @@ describe('Prompts', () => {
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
 				'Error reading Markdown file:',
 				expect.objectContaining({
-					code: 'ENOENT'
-				})
+					code: 'ENOENT',
+				}),
 			);
 		});
 

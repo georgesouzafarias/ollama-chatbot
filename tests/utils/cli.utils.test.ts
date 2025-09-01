@@ -10,8 +10,8 @@ import { CLIUtils } from '../../src/utils/cli.utils.js';
 import { CONFIG } from '../../src/config/constants.js';
 
 describe('CLIUtils', () => {
-	let cliUtils;
-	let consoleSpy;
+	let cliUtils: CLIUtils;
+	let consoleSpy: jest.SpiedFunction<typeof console.log>;
 
 	beforeEach(() => {
 		cliUtils = new CLIUtils();
@@ -20,14 +20,14 @@ describe('CLIUtils', () => {
 
 	afterEach(() => {
 		consoleSpy.mockRestore();
-		if (cliUtils?.rl) {
+		if ((cliUtils as any)?.rl) {
 			cliUtils.close();
 		}
 	});
 
 	describe('constructor', () => {
 		test('should create readline interface', () => {
-			expect(cliUtils.rl).toBeDefined();
+			expect((cliUtils as any).rl).toBeDefined();
 		});
 
 		test('should create CLIUtils instance', () => {
@@ -84,7 +84,7 @@ describe('CLIUtils', () => {
 
 		test('should close readline interface', () => {
 			const mockClose = jest.fn();
-			cliUtils.rl.close = mockClose;
+			(cliUtils as any).rl.close = mockClose;
 
 			cliUtils.close();
 
@@ -99,7 +99,7 @@ describe('CLIUtils', () => {
 
 		test('should use default prompt when none provided', async () => {
 			const mockQuestion = jest.fn().mockResolvedValue('test input');
-			cliUtils.rl.question = mockQuestion;
+			(cliUtils as any).rl.question = mockQuestion;
 
 			await cliUtils.question();
 
@@ -108,7 +108,7 @@ describe('CLIUtils', () => {
 
 		test('should use custom prompt when provided', async () => {
 			const mockQuestion = jest.fn().mockResolvedValue('test input');
-			cliUtils.rl.question = mockQuestion;
+			(cliUtils as any).rl.question = mockQuestion;
 			const customPrompt = 'Custom prompt: ';
 
 			await cliUtils.question(customPrompt);
@@ -120,7 +120,7 @@ describe('CLIUtils', () => {
 	describe('setupSignalHandlers', () => {
 		test('should setup SIGINT handler', () => {
 			const mockOn = jest.spyOn(process, 'on');
-			const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+			const mockExit = jest.spyOn(process, 'exit').mockImplementation((() => {}) as any);
 
 			// Create new instance to test signal handler setup
 			const testCLI = new CLIUtils();

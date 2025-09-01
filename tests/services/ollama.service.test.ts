@@ -5,8 +5,14 @@ const mockConfig = {
 	CONFIG: {
 		OLLAMA: {
 			MODEL: 'test-model',
-			STREAM: true,
+			STREAM: false,
 			THINK: false,
+			FORMAT: null,
+			OPTIONS: {
+				TEMPERATURE: 0.8,
+				TOP_P: 0.9,
+				REPEAT_PENALTY: 1.1,
+			},
 		},
 	},
 };
@@ -26,7 +32,7 @@ jest.mock('ollama', () => ({
 import { OllamaService } from '../../src/services/ollama.service.js';
 
 describe('OllamaService', () => {
-	let ollamaService;
+	let ollamaService: OllamaService;
 
 	beforeEach(() => {
 		ollamaService = new OllamaService();
@@ -34,11 +40,11 @@ describe('OllamaService', () => {
 
 	describe('constructor', () => {
 		test('should initialize with empty messages context', () => {
-			expect(ollamaService.messagesContext).toEqual([]);
+			expect((ollamaService as any).messagesContext).toEqual([]);
 		});
 
 		test('should initialize promptsService', () => {
-			expect(ollamaService.promptsService).toBeDefined();
+			expect((ollamaService as any).promptsService).toBeDefined();
 		});
 	});
 
@@ -46,7 +52,7 @@ describe('OllamaService', () => {
 		test('should add message to context', () => {
 			ollamaService.addMessage('user', 'Hello');
 
-			expect(ollamaService.messagesContext).toEqual([
+			expect((ollamaService as any).messagesContext).toEqual([
 				{ role: 'user', content: 'Hello' },
 			]);
 		});
@@ -55,7 +61,7 @@ describe('OllamaService', () => {
 			ollamaService.addMessage('user', 'Hello');
 			ollamaService.addMessage('assistant', 'Hi there!');
 
-			expect(ollamaService.messagesContext).toEqual([
+			expect((ollamaService as any).messagesContext).toEqual([
 				{ role: 'user', content: 'Hello' },
 				{ role: 'assistant', content: 'Hi there!' },
 			]);
@@ -69,7 +75,7 @@ describe('OllamaService', () => {
 
 			ollamaService.clearContext();
 
-			expect(ollamaService.messagesContext).toEqual([]);
+			expect((ollamaService as any).messagesContext).toEqual([]);
 		});
 	});
 
@@ -80,8 +86,8 @@ describe('OllamaService', () => {
 
 			const context = ollamaService.getContext();
 
-			expect(context).toEqual(ollamaService.messagesContext);
-			expect(context).not.toBe(ollamaService.messagesContext); // Should be a copy
+			expect(context).toEqual((ollamaService as any).messagesContext);
+			expect(context).not.toBe((ollamaService as any).messagesContext); // Should be a copy
 		});
 
 		test('should return empty array when no messages', () => {
@@ -96,7 +102,7 @@ describe('OllamaService', () => {
 
 			context.push({ role: 'user', content: 'Modified' });
 
-			expect(ollamaService.messagesContext).toHaveLength(1);
+			expect((ollamaService as any).messagesContext).toHaveLength(1);
 			expect(context).toHaveLength(2);
 		});
 	});
@@ -109,12 +115,12 @@ describe('OllamaService', () => {
 		test('should add system prompt to beginning of context', async () => {
 			const mockPrompt = 'Test system prompt';
 			const mockLoadSystemPrompt = jest.fn().mockResolvedValue(mockPrompt);
-			ollamaService.promptsService.loadSystemPrompt = mockLoadSystemPrompt;
+			(ollamaService as any).promptsService.loadSystemPrompt = mockLoadSystemPrompt;
 
 			await ollamaService.addSystemPrompt('./test/path.md');
 
 			expect(mockLoadSystemPrompt).toHaveBeenCalledWith('./test/path.md');
-			expect(ollamaService.messagesContext[0]).toEqual({
+			expect((ollamaService as any).messagesContext[0]).toEqual({
 				role: 'system',
 				content: mockPrompt,
 			});
@@ -127,7 +133,7 @@ describe('OllamaService', () => {
 			const mockLoadSystemPrompt = jest
 				.fn()
 				.mockRejectedValue(new Error('File not found'));
-			ollamaService.promptsService.loadSystemPrompt = mockLoadSystemPrompt;
+			(ollamaService as any).promptsService.loadSystemPrompt = mockLoadSystemPrompt;
 
 			await ollamaService.addSystemPrompt('./nonexistent.md');
 
@@ -135,18 +141,18 @@ describe('OllamaService', () => {
 				'Error loading system prompt:',
 				'File not found',
 			);
-			expect(ollamaService.messagesContext).toEqual([]);
+			expect((ollamaService as any).messagesContext).toEqual([]);
 
 			consoleErrorSpy.mockRestore();
 		});
 
 		test('should not add system prompt if content is empty', async () => {
 			const mockLoadSystemPrompt = jest.fn().mockResolvedValue(null);
-			ollamaService.promptsService.loadSystemPrompt = mockLoadSystemPrompt;
+			(ollamaService as any).promptsService.loadSystemPrompt = mockLoadSystemPrompt;
 
 			await ollamaService.addSystemPrompt('./empty.md');
 
-			expect(ollamaService.messagesContext).toEqual([]);
+			expect((ollamaService as any).messagesContext).toEqual([]);
 		});
 	});
 
@@ -159,7 +165,7 @@ describe('OllamaService', () => {
 			const testMessage = 'Hello, how are you?';
 			ollamaService.addMessage('user', testMessage);
 
-			expect(ollamaService.messagesContext).toContainEqual({
+			expect((ollamaService as any).messagesContext).toContainEqual({
 				role: 'user',
 				content: testMessage,
 			});

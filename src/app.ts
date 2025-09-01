@@ -4,13 +4,17 @@ import { CLIUtils } from './utils/cli.utils.js';
 import { CONFIG } from './config/constants.js';
 
 export class ChatApplication {
+	private ollamaService: OllamaService;
+	private cliUtils: CLIUtils;
+	private modelService: ModelService;
+
 	constructor() {
 		this.ollamaService = new OllamaService();
 		this.cliUtils = new CLIUtils();
 		this.modelService = new ModelService();
 	}
 
-	async start() {
+	async start(): Promise<void> {
 		this.cliUtils.log(CONFIG.MESSAGES.WELCOME);
 		if (!(await this.modelService.isModelInstalled(CONFIG.OLLAMA.MODEL))) {
 			await this.modelService.pullModelIfNeeded(CONFIG.OLLAMA.MODEL);
@@ -19,14 +23,14 @@ export class ChatApplication {
 
 		try {
 			await this.chatLoop();
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Application error:', error.message);
 		} finally {
 			this.cleanup();
 		}
 	}
 
-	async chatLoop() {
+	private async chatLoop(): Promise<void> {
 		while (true) {
 			const input = await this.cliUtils.question();
 
@@ -47,13 +51,13 @@ export class ChatApplication {
 				}
 
 				this.cliUtils.newLine();
-			} catch (err) {
+			} catch (err: any) {
 				this.cliUtils.log('Error processing message.', err.message);
 			}
 		}
 	}
 
-	cleanup() {
+	private cleanup(): void {
 		this.cliUtils.close();
 	}
 }

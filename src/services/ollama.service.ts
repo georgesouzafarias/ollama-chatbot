@@ -12,10 +12,10 @@ interface Message {
 
 export class OllamaService {
 	private messagesContext: Message[];
-	private promptsService: Prompts;
-	private calculatorTools: CalculatorTools;
-	private allTools: any[];
-	private availableFunctions: Record<string, Function>;
+	private readonly promptsService: Prompts;
+	private readonly calculatorTools: CalculatorTools;
+	private readonly allTools: any[];
+	private readonly availableFunctions: Record<string, Function>;
 
 	constructor() {
 		this.messagesContext = [];
@@ -40,14 +40,16 @@ export class OllamaService {
 		}
 	}
 
-	private async processMessage(): Promise<ChatResponse | AsyncIterable<ChatResponse>> {
+	private async processMessage(): Promise<
+		ChatResponse | AsyncIterable<ChatResponse>
+	> {
 		if (CONFIG.OLLAMA.STREAM) {
 			return await ollama.chat({
 				model: CONFIG.OLLAMA.MODEL,
 				messages: this.messagesContext,
 				stream: true,
 				think: CONFIG.OLLAMA.THINK,
-				format: CONFIG.OLLAMA.FORMAT || undefined,
+				format: CONFIG.OLLAMA.FORMAT ?? undefined,
 				tools: this.allTools,
 				options: {
 					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
@@ -61,7 +63,7 @@ export class OllamaService {
 				messages: this.messagesContext,
 				stream: false,
 				think: CONFIG.OLLAMA.THINK,
-				format: CONFIG.OLLAMA.FORMAT || undefined,
+				format: CONFIG.OLLAMA.FORMAT ?? undefined,
 				tools: this.allTools,
 				options: {
 					temperature: CONFIG.OLLAMA.OPTIONS.TEMPERATURE,
@@ -72,7 +74,9 @@ export class OllamaService {
 
 			if (response.message.tool_calls) {
 				this.messagesContext.push(response.message);
-				const toolResults = await this.processToolCalls(response.message.tool_calls);
+				const toolResults = await this.processToolCalls(
+					response.message.tool_calls,
+				);
 				this.messagesContext.push(...toolResults);
 
 				return await this.processMessage();
@@ -86,7 +90,7 @@ export class OllamaService {
 		this.addMessage(role, message);
 
 		try {
-			const response = await this.processMessage() as ChatResponse;
+			const response = (await this.processMessage()) as ChatResponse;
 			let assistantMessage = '';
 
 			if (CONFIG.OLLAMA.THINK) {
@@ -110,11 +114,15 @@ export class OllamaService {
 		}
 	}
 
-	async sendMessageStream(message: string, role: string = 'user'): Promise<void> {
+	async sendMessageStream(
+		message: string,
+		role: string = 'user',
+	): Promise<void> {
 		this.addMessage(role, message);
 
 		try {
-			const response = await this.processMessage() as AsyncIterable<ChatResponse>;
+			const response =
+				(await this.processMessage()) as AsyncIterable<ChatResponse>;
 			let assistantMessage = '';
 
 			if (CONFIG.OLLAMA.THINK) {

@@ -1,6 +1,6 @@
 export class CalculatorTools {
 	public availableFunctions: Record<string, Function>;
-	private tools: any[];
+	private readonly tools: any[];
 
 	constructor() {
 		this.availableFunctions = {

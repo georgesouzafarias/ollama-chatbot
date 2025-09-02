@@ -4,9 +4,9 @@ import { CLIUtils } from './utils/cli.utils.js';
 import { CONFIG } from './config/constants.js';
 
 export class ChatApplication {
-	private ollamaService: OllamaService;
-	private cliUtils: CLIUtils;
-	private modelService: ModelService;
+	private readonly ollamaService: OllamaService;
+	private readonly cliUtils: CLIUtils;
+	private readonly modelService: ModelService;
 
 	constructor() {
 		this.ollamaService = new OllamaService();

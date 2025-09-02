@@ -22,7 +22,7 @@ export class ModelService {
 	async pullModelIfNeeded(modelName: string): Promise<void> {
 		try {
 			console.log(`The ${modelName} doesn't exist. Downloading ...`);
-			
+
 			if (CONFIG.OLLAMA.STREAM) {
 				const stream = await ollama.pull({
 					model: modelName,
@@ -45,7 +45,7 @@ export class ModelService {
 					}
 				}
 			} else {
-				const result = await ollama.pull({
+				ollama.pull({
 					model: modelName,
 					insecure: false,
 					stream: false,

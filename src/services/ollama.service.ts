@@ -2,6 +2,7 @@ import ollama, { ChatResponse, ToolCall } from 'ollama';
 import { CONFIG } from '../config/constants.js';
 import { Prompts } from '../utils/prompt.js';
 import { CalculatorTools } from '../tools/calculator.js';
+import { VectorStoreTools } from '../tools/vectorstore.js';
 
 interface Message {
 	role: string;
@@ -14,6 +15,7 @@ export class OllamaService {
 	private messagesContext: Message[];
 	private readonly promptsService: Prompts;
 	private readonly calculatorTools: CalculatorTools;
+	private readonly vectorStoreTools: VectorStoreTools;
 	private readonly allTools: any[];
 	private readonly availableFunctions: Record<string, Function>;
 
@@ -21,8 +23,15 @@ export class OllamaService {
 		this.messagesContext = [];
 		this.promptsService = new Prompts();
 		this.calculatorTools = new CalculatorTools();
-		this.allTools = [...this.calculatorTools.getTools()];
-		this.availableFunctions = this.calculatorTools.availableFunctions;
+		this.vectorStoreTools = new VectorStoreTools();
+		this.allTools = [
+			...this.calculatorTools.getTools(),
+			...this.vectorStoreTools.getTools(),
+		];
+		this.availableFunctions = {
+			...this.calculatorTools.availableFunctions,
+			...this.vectorStoreTools.availableFunctions,
+		};
 	}
 
 	addMessage(role: string, content: string): void {
@@ -172,7 +181,7 @@ export class OllamaService {
 		}
 
 		try {
-			return func(args.a, args.b);
+			return func(args);
 		} catch (error: any) {
 			console.error(`Erro calling ${functionName}:`, error.message);
 			throw error;

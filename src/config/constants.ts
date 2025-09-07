@@ -15,6 +15,12 @@ export const CONFIG = {
 	PROMPTS: {
 		SYSTEM_PROMPT_PATH: './prompts/system_prompt.md',
 	},
+	PINECONE: {
+		APIKEY: process.env.PINECONEKEY,
+		INDEX_NAME: process.env.INDEX_NAME,
+		INDEX_HOST: process.env.INDEX_HOST,
+		NAMESPACE: process.env.NAMESPACE,
+	},
 	MESSAGES: {
 		WELCOME: 'Type something or press Ctrl+C to exit',
 		GOODBYE: 'See you later!',

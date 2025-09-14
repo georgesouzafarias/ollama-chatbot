@@ -1,6 +1,6 @@
 import ollama, { ChatResponse, ToolCall } from 'ollama';
 import { CONFIG } from '../config/constants.js';
-import { Prompts } from '../utils/prompt.js';
+import { Prompts } from '../utils/prompt.utils.js';
 import { CalculatorTools } from '../tools/calculator.js';
 import { VectorStoreTools } from '../tools/vectorstore.js';
 

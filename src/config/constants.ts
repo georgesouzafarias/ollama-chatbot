@@ -27,4 +27,7 @@ export const CONFIG = {
 		INTERRUPTED: '\nProgram interrupted by user (Ctrl+C)',
 		PROMPT: '> ',
 	},
+	SYSTEM: {
+		LOGPATH: './output.log',
+	},
 };

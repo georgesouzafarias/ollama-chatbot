@@ -5,7 +5,7 @@ export class Prompts {
 		try {
 			return await readFile(filePath, { encoding: 'utf-8' });
 		} catch (err: any) {
-			console.error('Error reading Markdown file:', err);
+			console.error('Error reading Markdown file: ', err);
 		}
 	}
 }

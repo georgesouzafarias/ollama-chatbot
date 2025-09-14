@@ -22,8 +22,8 @@ export class Logger {
 			},
 			pino.destination({
 				dest: filePath,
-				minLength: 4096,
-				sync: false,
+				minLength: 0,
+				sync: true,
 			}),
 		);
 

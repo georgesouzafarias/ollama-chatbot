@@ -1,8 +1,9 @@
 import ollama, { ChatResponse, ToolCall } from 'ollama';
 import { CONFIG } from '../config/constants.js';
-import { Prompts } from '../utils/prompt.js';
+import { Prompts } from '../utils/prompt.utils.js';
 import { CalculatorTools } from '../tools/calculator.js';
 import { VectorStoreTools } from '../tools/vectorstore.js';
+import { logger } from '../decorators/logging.decorator.js';
 
 interface Message {
 	role: string;
@@ -34,10 +35,12 @@ export class OllamaService {
 		};
 	}
 
+	@logger
 	addMessage(role: string, content: string): void {
 		this.messagesContext.push({ role, content });
 	}
 
+	@logger
 	async addSystemPrompt(filePath: string): Promise<void> {
 		try {
 			const systemPrompt = await this.promptsService.loadSystemPrompt(filePath);
@@ -49,6 +52,7 @@ export class OllamaService {
 		}
 	}
 
+	@logger
 	private async processMessage(): Promise<
 		ChatResponse | AsyncIterable<ChatResponse>
 	> {
@@ -95,6 +99,7 @@ export class OllamaService {
 		}
 	}
 
+	@logger
 	async sendMessage(message: string, role: string = 'user'): Promise<void> {
 		this.addMessage(role, message);
 
@@ -123,6 +128,7 @@ export class OllamaService {
 		}
 	}
 
+	@logger
 	async sendMessageStream(
 		message: string,
 		role: string = 'user',
@@ -174,6 +180,7 @@ export class OllamaService {
 		}
 	}
 
+	@logger
 	private executeFunction(functionName: string, args: any): any {
 		const func = this.availableFunctions[functionName];
 		if (!func) {
@@ -188,6 +195,7 @@ export class OllamaService {
 		}
 	}
 
+	@logger
 	private async processToolCalls(toolCalls: ToolCall[]): Promise<Message[]> {
 		const results: Message[] = [];
 		for (const tool of toolCalls) {
@@ -211,10 +219,12 @@ export class OllamaService {
 		return results;
 	}
 
+	@logger
 	clearContext(): void {
 		this.messagesContext = [];
 	}
 
+	@logger
 	getContext(): Message[] {
 		return [...this.messagesContext];
 	}

@@ -1,5 +1,6 @@
 import ollama, { ListResponse } from 'ollama';
 import { CONFIG } from '../config/constants.js';
+import { logger } from '../decorators/logging.decorator.js';
 
 export class ModelService {
 	async listInstalledModels(): Promise<ListResponse['models'] | undefined> {
@@ -10,6 +11,7 @@ export class ModelService {
 		}
 	}
 
+	@logger
 	async isModelInstalled(modelName: string): Promise<boolean | undefined> {
 		try {
 			const listModel = await this.listInstalledModels();
@@ -19,6 +21,7 @@ export class ModelService {
 		}
 	}
 
+	@logger
 	async pullModelIfNeeded(modelName: string): Promise<void> {
 		try {
 			console.log(`The ${modelName} doesn't exist. Downloading ...`);

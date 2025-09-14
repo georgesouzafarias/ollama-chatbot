@@ -2,6 +2,7 @@ import { OllamaService } from './services/ollama.service.js';
 import { ModelService } from './services/model.service.js';
 import { CLIUtils } from './utils/cli.utils.js';
 import { CONFIG } from './config/constants.js';
+import { logger } from './decorators/logging.decorator.js';
 
 export class ChatApplication {
 	private readonly ollamaService: OllamaService;
@@ -14,6 +15,7 @@ export class ChatApplication {
 		this.modelService = new ModelService();
 	}
 
+	@logger
 	async start(): Promise<void> {
 		this.cliUtils.log(CONFIG.MESSAGES.WELCOME);
 		if (!(await this.modelService.isModelInstalled(CONFIG.OLLAMA.MODEL))) {
@@ -30,6 +32,7 @@ export class ChatApplication {
 		}
 	}
 
+	@logger
 	private async chatLoop(): Promise<void> {
 		while (true) {
 			const input = await this.cliUtils.question();

@@ -5,7 +5,7 @@ export class LoggerService {
 	public logstream: any;
 	private static instance: LoggerService;
 
-	public static getInstace(): LoggerService {
+	public static getInstance(): LoggerService {
 		if (!LoggerService.instance) {
 			LoggerService.instance = new LoggerService();
 			LoggerService.instance.initialize();
@@ -18,5 +18,9 @@ export class LoggerService {
 
 	public info(message: string, data?: any): void {
 		this.logger.info(message, data);
+	}
+
+	public error(message: string, data?: any): void {
+		this.logger.error(message, data);
 	}
 }

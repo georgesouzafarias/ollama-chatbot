@@ -1,5 +1,6 @@
 import { Pinecone } from '@pinecone-database/pinecone';
 import { CONFIG } from '../config/constants.js';
+import { logger } from '../decorators/logging.decorator.js';
 
 export class PineconeService {
 	apiKey: string = CONFIG.PINECONE.APIKEY || '';
@@ -19,6 +20,7 @@ export class PineconeService {
 			.namespace(this.namespaceName);
 	}
 
+	@logger
 	async searchRecords(searchValue: any) {
 		return await this.namespace.searchRecords({
 			query: {

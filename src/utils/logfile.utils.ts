@@ -10,12 +10,15 @@ export class Logger {
 		this.pinoInstance ??= pino(
 			{
 				level: 'info',
-
 				formatters: {
 					level: (label) => {
 						return { level: label };
 					},
+					bindings(bindings) {
+						return {};
+					},
 				},
+				timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
 			},
 			pino.destination({
 				dest: filePath,

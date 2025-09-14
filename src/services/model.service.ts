@@ -21,6 +21,7 @@ export class ModelService {
 		}
 	}
 
+	@logger
 	async pullModelIfNeeded(modelName: string): Promise<void> {
 		try {
 			console.log(`The ${modelName} doesn't exist. Downloading ...`);
